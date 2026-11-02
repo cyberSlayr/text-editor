@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stack>
 #include <string>
+#include <fstream>
 #include <sstream>
 
 using namespace std;
@@ -64,6 +65,51 @@ public:
 
         cout << "\nText Cleared Successfully!\n";
     }
+
+    void openFile()
+    {
+        string fileName;
+
+        cout << "\nEnter file name: ";
+
+        // Clear the previous input
+        cin.ignore(10000, '\n');
+
+        getline(cin, fileName);
+
+        // Open the file
+        ifstream file(fileName);
+
+        // Check whether file exists
+        if (!file)
+        {
+            cout << "\nFile could not be opened!\n";
+            return;
+        }
+
+        // Read the complete file
+        stringstream buffer;
+        buffer << file.rdbuf();
+
+        string newText = buffer.str();
+
+        file.close();
+
+        // Save current text for Undo
+        undoStack.push(currentText);
+
+        // Clear Redo history
+        while (!redoStack.empty())
+        {
+            redoStack.pop();
+        }
+
+        // Replace current text with file contents
+        currentText = newText;
+
+        cout << "\nFile opened successfully!\n";
+    }
+
     void undo()
     {
         if (undoStack.empty())
@@ -187,7 +233,8 @@ int main()
         cout << "4. Redo\n";
         cout << "5. Clear Text\n";
         cout << "6. Word and Character Counter\n";
-        cout << "7. Exit\n";
+        cout << "7. Open File\n";
+        cout << "8. Exit\n";
         cout << "=====================================\n";
 
         cout << "Enter Choice : ";
@@ -218,6 +265,10 @@ int main()
             editor.wordCharacterCounter(editor.getText());
             break;
         case 7:
+            editor.openFile();
+            break;
+
+        case 8:
             cout << "\nThank You!\n";
             break;
 
